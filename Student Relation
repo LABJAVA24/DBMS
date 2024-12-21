@@ -1,80 +1,155 @@
-A) create the following relation for the student
-student (regno: string, name: string, class: string, bdate: date, marks1: int, marks2:int, marks3  : int)
- 1.Enter atleast five tuples of the above relation
- 2.Demonstrate the usage of following clauses for the above relations
-a. where
-c. having
-b. orderby
-d. group by
-3. Demonstrate the usage of following clauses for the above relations
-a. sum
-d. like
-b. avg
-e. Between
-c. count
-k. max and min
-4. demonstrate the rollback and commit command for the above relation.
+CREATE TABLE std1 (
 
-create table std1
-(
-regno varchar (20) primary key,
-name  varchar (20),
-class  varchar (20),
-bdate date,
-marks1 int,
-marks2 int,
-marks3 int
+    regno VARCHAR(20) PRIMARY KEY,
+
+    name VARCHAR(20),
+
+    class VARCHAR(20),
+
+    bdate DATE,
+
+    marks1 INT,
+
+    marks2 INT,
+
+    marks3 INT
+
 );
 
 
-insert into std1 values('1','adil','BSC','12-jun-2004',50,70,90);
-insert into std1 values('2','fayaz','BSC','13-jun-2003',80,80,50);
-insert into std1 values('3','kaif','BED','14-jun-2001',60,60,80);
-insert into std1 values('4','ahti','BSE','15-jun-2002',40,50,50);
-insert into std1 values('5','ehab','BSC','16-jun-2001',70,40,70);
 
-2. demonstrate the usage of following classes 
+-- Insert Data
 
- a)where
-    
-select *from std where name='kaif';
+INSERT INTO std1 VALUES ('1', 'adil', 'BSC', TO_DATE('12-JUN-2004', 'DD-MON-YYYY'), 50, 70, 90);
 
- b) order by
+INSERT INTO std1 VALUES ('2', 'fayaz', 'BSC', TO_DATE('13-JUN-2003', 'DD-MON-YYYY'), 80, 80, 50);
 
-select *from std1 order by class ASC;
+INSERT INTO std1 VALUES ('3', 'kaif', 'BED', TO_DATE('14-JUN-2001', 'DD-MON-YYYY'), 60, 60, 80);
 
- c) having
+INSERT INTO std1 VALUES ('4', 'ahti', 'BSE', TO_DATE('15-JUN-2002', 'DD-MON-YYYY'), 40, 50, 50);
 
-select regno,name,marks1 from std group by regno, name.marks1 having marks1 > 65;
-
- d) group by
-
-select class from std group by class;
+INSERT INTO std1 VALUES ('5', 'ehab', 'BSC', TO_DATE('16-JUN-2001', 'DD-MON-YYYY'), 70, 40, 70);
 
 
-3. Demonstrate the usage of the following 
 
-  a) sum
+SELECT * FROM std1 WHERE name = 'kaif';
 
-select sum (marks1) from std;
 
-  b) avg
 
-select avg (marks1) from std;
+SELECT * FROM std1 ORDER BY class ASC;
 
-  c) count
 
-select count(regno) from std;
 
- d) like
+SELECT regno, name, marks1 
 
-select *from std where 'class' like BSE;
+FROM std1
 
- e) between
+GROUP BY regno, name, marks1
 
-select *from std where 'marks1' between 80 and 90;
+HAVING marks1 > 65;
 
- f) max and min
 
-select min(marks1) as lowest_marks from std;
-select max(marks1) as highest_marks from std;
+
+SELECT class FROM std1 GROUP BY class;
+
+SELECT SUM(marks1) FROM std1;
+
+
+
+SELECT AVG(marks1) FROM std1;
+
+
+
+SELECT COUNT(regno) FROM std1;
+
+
+
+SELECT * FROM std1 WHERE class LIKE 'BSE';
+
+
+
+SELECT * FROM std1 WHERE marks1 BETWEEN 80 AND 90;
+
+
+
+SELECT MIN(marks1) AS lowest_marks FROM std1;
+
+SELECT MAX(marks1) AS highest_marks FROM std1;
+
+
+
+-- Insert new data
+
+INSERT INTO std1 VALUES ('6', 'ali', 'BSC', TO_DATE('17-JUN-2002', 'DD-MON-YYYY'), 85, 75, 65);
+
+
+
+-- Commit the transaction to save the changes
+
+COMMIT;
+
+
+
+-- Rollback the changes made by the previous insert (undo the insert)
+
+ROLLBACK;
+
+
+
+-- PL/SQL
+
+DECLARE
+
+   -- Declare a user-defined exception
+
+   invalid_marks EXCEPTION;
+
+
+
+   -- Variable to hold the student's marks
+
+   marks INT;
+
+
+
+BEGIN
+
+   -- Simulate input for marks (you can change this value to test different scenarios)
+
+   marks := 80; 
+
+
+
+   -- Check if marks are invalid (for example, negative or greater than 100)
+
+   IF marks < 0 OR marks > 100 THEN
+
+      -- Raise the user-defined exception
+
+      RAISE invalid_marks;
+
+   END IF;
+
+
+
+   -- If the marks are valid, display them
+
+   DBMS_OUTPUT.PUT_LINE('The student marks are: ' || marks);
+
+
+
+EXCEPTION
+
+   -- Exception handler for the user-defined exception
+
+   WHEN invalid_marks THEN
+
+      DBMS_OUTPUT.PUT_LINE('Error: Invalid marks! Marks should be between 0 and 100.');
+
+   WHEN OTHERS THEN
+
+      DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+
+END;
+
+/ 
