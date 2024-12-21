@@ -1,0 +1,249 @@
+-- Create STUDENT table
+
+CREATE TABLE STUDENT (
+
+    regno VARCHAR2(20) PRIMARY KEY,
+
+    name VARCHAR2(50),
+
+    major VARCHAR2(50),
+
+    bdate DATE
+
+);
+
+
+
+-- Create COURSE table
+
+CREATE TABLE COURSE (
+
+    course# INT PRIMARY KEY,
+
+    cname VARCHAR2(50),
+
+    dept VARCHAR2(50)
+
+);
+
+
+
+-- Create ENROLL table
+
+CREATE TABLE ENROLL (
+
+    regno VARCHAR2(20),
+
+    course# INT,
+
+    sem INT,
+
+    marks INT,
+
+    PRIMARY KEY (regno, course#),
+
+    FOREIGN KEY (regno) REFERENCES STUDENT(regno),
+
+    FOREIGN KEY (course#) REFERENCES COURSE(course#)
+
+);
+
+
+
+-- Create TEXTBOOK table
+
+CREATE TABLE TEXTBOOK (
+
+    ISBN INT PRIMARY KEY,
+
+    book_title VARCHAR2(100),
+
+    publisher VARCHAR2(50),
+
+    author VARCHAR2(50)
+
+);
+
+
+
+-- Create BOOK_ADOPTION table
+
+CREATE TABLE BOOK_ADOPTION (
+
+    course# INT,
+
+    sem INT,
+
+    book_ISBN# INT,
+
+    PRIMARY KEY (course#, sem, book_ISBN#),
+
+    FOREIGN KEY (course#) REFERENCES COURSE(course#),
+
+    FOREIGN KEY (book_ISBN#) REFERENCES TEXTBOOK(ISBN)
+
+);
+
+
+
+-- Insert data into STUDENT table
+
+INSERT INTO STUDENT VALUES ('S101', 'Alice', 'Computer Science', TO_DATE('1999-01-15', 'YYYY-MM-DD'));
+
+INSERT INTO STUDENT VALUES ('S102', 'Bob', 'Mathematics', TO_DATE('2000-04-10', 'YYYY-MM-DD'));
+
+INSERT INTO STUDENT VALUES ('S103', 'Charlie', 'Computer Science', TO_DATE('2001-06-12', 'YYYY-MM-DD'));
+
+INSERT INTO STUDENT VALUES ('S104', 'David', 'Physics', TO_DATE('1998-11-05', 'YYYY-MM-DD'));
+
+INSERT INTO STUDENT VALUES ('S105', 'Eva', 'Mathematics', TO_DATE('2000-09-30', 'YYYY-MM-DD'));
+
+
+
+-- Insert data into COURSE table
+
+INSERT INTO COURSE VALUES (1, 'Data Structures', 'Computer Science');
+
+INSERT INTO COURSE VALUES (2, 'Linear Algebra', 'Mathematics');
+
+INSERT INTO COURSE VALUES (3, 'Quantum Mechanics', 'Physics');
+
+INSERT INTO COURSE VALUES (4, 'Algorithms', 'Computer Science');
+
+INSERT INTO COURSE VALUES (5, 'Differential Equations', 'Mathematics');
+
+
+
+-- Insert data into ENROLL table
+
+INSERT INTO ENROLL VALUES ('S101', 1, 1, 85);
+
+INSERT INTO ENROLL VALUES ('S102', 2, 1, 90);
+
+INSERT INTO ENROLL VALUES ('S103', 1, 2, 88);
+
+INSERT INTO ENROLL VALUES ('S104', 3, 1, 70);
+
+INSERT INTO ENROLL VALUES ('S105', 5, 1, 75);
+
+
+
+-- Insert data into TEXTBOOK table
+
+INSERT INTO TEXTBOOK VALUES (101, 'Introduction to Algorithms', 'Pearson', 'Cormen');
+
+INSERT INTO TEXTBOOK VALUES (102, 'Linear Algebra Done Right', 'Springer', 'Axler');
+
+INSERT INTO TEXTBOOK VALUES (103, 'Quantum Mechanics', 'Wiley', 'Griffiths');
+
+INSERT INTO TEXTBOOK VALUES (104, 'Algorithms Unlocked', 'MIT Press', 'Levitin');
+
+INSERT INTO TEXTBOOK VALUES (105, 'Differential Equations', 'McGraw-Hill', 'Blanchard');
+
+
+
+-- Insert data into BOOK_ADOPTION table
+
+INSERT INTO BOOK_ADOPTION VALUES (1, 1, 101);
+
+INSERT INTO BOOK_ADOPTION VALUES (1, 1, 104);
+
+INSERT INTO BOOK_ADOPTION VALUES (2, 1, 102);
+
+INSERT INTO BOOK_ADOPTION VALUES (3, 1, 103);
+
+INSERT INTO BOOK_ADOPTION VALUES (4, 1, 101);
+
+
+
+-- Add a new textbook to the TEXTBOOK table
+
+INSERT INTO TEXTBOOK VALUES (106, 'Advanced Topics in Algorithms', 'Wiley', 'Kleinberg');
+
+
+
+-- Make this book be adopted by the CS department in the 2nd semester
+
+INSERT INTO BOOK_ADOPTION VALUES (1, 2, 106);
+
+
+
+SELECT c.course#, ba.book_ISBN#, t.book_title
+
+FROM COURSE c
+
+JOIN BOOK_ADOPTION ba ON c.course# = ba.course#
+
+JOIN TEXTBOOK t ON ba.book_ISBN# = t.ISBN
+
+WHERE c.dept = 'Computer Science'
+
+GROUP BY c.course#, ba.book_ISBN#, t.book_title
+
+HAVING COUNT(ba.book_ISBN#) > 2
+
+ORDER BY t.book_title;
+
+
+
+SELECT DISTINCT c.dept
+
+FROM COURSE c
+
+JOIN BOOK_ADOPTION ba ON c.course# = ba.course#
+
+JOIN TEXTBOOK t ON ba.book_ISBN# = t.ISBN
+
+WHERE t.publisher = 'Pearson';
+
+-- PL/SQL
+
+DECLARE
+
+    -- Declare a custom exception
+
+    e_invalid_marks EXCEPTION;
+
+
+
+    -- Declare a variable for marks
+
+    v_marks INT := 105;  -- Set marks to an invalid value (greater than 100)
+
+
+
+BEGIN
+
+    -- Check if the marks are valid
+
+    IF v_marks > 100 THEN
+
+        -- Raise the custom exception
+
+        RAISE e_invalid_marks;
+
+    ELSE
+
+        -- Insert marks if they are valid (this is just an example action)
+
+        DBMS_OUTPUT.PUT_LINE('Marks are valid: ' || v_marks);
+
+    END IF;
+
+
+
+EXCEPTION
+
+    -- Handle the custom exception
+
+    WHEN e_invalid_marks THEN
+
+        DBMS_OUTPUT.PUT_LINE('Error: Marks cannot exceed 100.');
+
+    WHEN OTHERS THEN
+
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+
+END;
+
+/
