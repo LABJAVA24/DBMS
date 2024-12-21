@@ -1,75 +1,151 @@
-consider the following database that maintain information about employee
- and Deparrments.
+-- Create the departments table
 
+CREATE TABLE departments
 
-Employee (empid:int, ename: String, age: int, Salary: int #depno:int)
-
-department (deptno: int ,dname: string, #managersid:int )
-i) Create the above tables by property specifying the primary keys and foriegn Keys.
-
-i) Enter atleast 5 tuples for each relation.
-
-
-ii)  Display empid & empname whose Salary lies between 10,000 & 50,000
-
-iii) list empname and Salary for all the employees working for cs department 
-
-iv) Display empname and dept name for all the manager.
-
-
-
-
-create the above tables by properly specifying the primary keys and foriegn keys
-
-create table departments
 (
-deptno int primary key,
-dname varchar(10),
-manager_id int);
+
+    deptno INT PRIMARY KEY,
+
+    dname VARCHAR(10),
+
+    manager_id INT
+
+);
 
 
-create table employees
+
+-- Create the employees table with a foreign key reference to departments
+
+CREATE TABLE employees
+
 (
-empid varchar(10) primary key,
-ename varchar(10),
-age int,
-salary int,
-deptno int references departments);
+
+    empid VARCHAR(10) PRIMARY KEY,
+
+    ename VARCHAR(10),
+
+    age INT,
+
+    salary INT,
+
+    deptno INT,
+
+    FOREIGN KEY (deptno) REFERENCES departments(deptno)
+
+);
 
 
 
-ii) Enter at least 5 tuples for each relation.
+-- Insert 5 tuples into the departments table
 
-insert into departments values(1,'finance',12);
-insert into departments values(2,'HR',11);
-insert into departments values(3,'Accounting',16);
-insert into departments values(4,'Marketing',17);
-insert into departments values(5,'sales',18);
+INSERT INTO departments VALUES (1, 'finance', 12);
 
-select *from departments
+INSERT INTO departments VALUES (2, 'HR', 11);
 
+INSERT INTO departments VALUES (3, 'Accounting', 16);
 
+INSERT INTO departments VALUES (4, 'Marketing', 17);
 
-
-insert into employees values(1,'vaseel',18,16000,1);
-insert into employees values(2,'zaaki',18,17000,2);
-insert into employees values(3,'faraz',23,500000,2);
-insert into employees values(4,'Ahtisham',22,35000,3);
-insert into employees values(5,'Rabay',22,40000,3);
-
-select *from employees
+INSERT INTO departments VALUES (5, 'sales', 18);
 
 
-iii)Display emp-id & empname whose salary lies between 10,000 and 50,0000.
 
-select empid,ename from employees where salary between 10000 and 50000;
+-- Display all records from the departments table
 
-
-iv)List empname & salary for all the employees working for HR dept.
-
-select ename,salary from employees where deptno in (select deptno from departments where dname='HR');
+SELECT * FROM departments;
 
 
-v) Display empname & deptname for all the employee 
 
-select ename,dname from employees,departments where employees.deptno=departmentsdeptno;
+-- Insert 5 tuples into the employees table
+
+INSERT INTO employees VALUES (1, 'vaseel', 18, 16000, 1);
+
+INSERT INTO employees VALUES (2, 'zaaki', 18, 17000, 2);
+
+INSERT INTO employees VALUES (3, 'faraz', 23, 500000, 2);
+
+INSERT INTO employees VALUES (4, 'Ahtisham', 22, 35000, 3);
+
+INSERT INTO employees VALUES (5, 'Rabay', 22, 40000, 3);
+
+
+
+-- Display all records from the employees table
+
+SELECT * FROM employees;
+
+
+
+SELECT empid, ename 
+
+FROM employees 
+
+WHERE salary BETWEEN 10000 AND 50000;
+
+
+
+SELECT ename, salary 
+
+FROM employees 
+
+WHERE deptno = (SELECT deptno FROM departments WHERE dname = 'HR');
+
+
+
+SELECT e.ename, d.dname
+
+FROM employees e
+
+JOIN departments d ON e.deptno = d.deptno;
+
+
+
+
+
+-- PL/SQL
+
+DECLARE
+
+    -- Declare variables for the new employee details
+
+    v_empid VARCHAR2(10) := '6'; 
+
+    v_ename VARCHAR2(50) := 'John Doe';
+
+    v_age INT := 30;
+
+    v_salary INT := 55000;
+
+    v_deptno INT := 2; -- Assuming department 2 exists (for example, HR department)
+
+BEGIN
+
+    -- Insert the new employee into the employees table
+
+    INSERT INTO employees (empid, ename, age, salary, deptno)
+
+    VALUES (v_empid, v_ename, v_age, v_salary, v_deptno);
+
+
+
+    -- Commit the transaction to save the changes
+
+    COMMIT;
+
+    -- Display success message
+
+    DBMS_OUTPUT.PUT_LINE('Employee inserted successfully!');
+
+EXCEPTION
+
+    WHEN OTHERS THEN
+
+        -- In case of an error, rollback the transaction and display the error
+
+        ROLLBACK;
+
+        DBMS_OUTPUT.PUT_LINE('Error occurred: ' || SQLERRM);
+
+END;
+
+/
