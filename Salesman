@@ -1,3 +1,5 @@
+-- Create tables for SALESMAN, CUSTOMER, ORDERS
+
 CREATE TABLE SALESMAN (
 
     SALESMAN_ID INT PRIMARY KEY,
@@ -48,11 +50,7 @@ CREATE TABLE ORDERS (
 
 
 
-
-
 -- Insert Data
-
--- Insert into SALESMAN
 
 INSERT INTO SALESMAN VALUES (101, 'rabay', 'shiralkoppa', 18.00);
 
@@ -66,8 +64,6 @@ INSERT INTO SALESMAN VALUES (105, 'lara', 'mumbai', 19.00);
 
 
 
--- Insert into CUSTOMER
-
 INSERT INTO CUSTOMER VALUES (501, 'sharbanu', 'los angeles', 10, 103);
 
 INSERT INTO CUSTOMER VALUES (502, 'mike', 'new york', 12, 102);
@@ -80,95 +76,95 @@ INSERT INTO CUSTOMER VALUES (505, 'sara', 'shiralkoppa', 7, 101);
 
 
 
--- Insert into ORDERS
+INSERT INTO ORDERS VALUES (1, 1000.00, TO_DATE('04-FEB-22', 'DD-MON-YY'), 501, 103);
 
-INSERT INTO ORDERS VALUES (1, 1000.00, '04-FEB-22', 501, 103);
+INSERT INTO ORDERS VALUES (2, 1500.00, TO_DATE('01-MAR-22', 'DD-MON-YY'), 502, 102);
 
-INSERT INTO ORDERS VALUES (2, 1500.00, '01-MAR-22', 502, 102);
+INSERT INTO ORDERS VALUES (3, 2000.00, TO_DATE('15-APR-22', 'DD-MON-YY'), 503, 104);
 
-INSERT INTO ORDERS VALUES (3, 2000.00, '15-APR-22', 503, 104);
+INSERT INTO ORDERS VALUES (4, 2500.00, TO_DATE('20-MAY-22', 'DD-MON-YY'), 504, 105);
 
-INSERT INTO ORDERS VALUES (4, 2500.00, '20-MAY-22', 504, 105);
-
-INSERT INTO ORDERS VALUES (5, 3000.00, '25-JUN-22', 505, 101);
+INSERT INTO ORDERS VALUES (5, 3000.00, TO_DATE('25-JUN-22', 'DD-MON-YY'), 505, 101);
 
 
 
-i)
+-- Query 1: Demonstrate how to select customers whose grade is greater than the average grade in 'bhatkal'
 
-SELECT GRADE, COUNT(CUSTOMER_ID) 
+SELECT GRADE, COUNT(CUSTOMER_ID)
 
-FROM CUSTOMER 
+FROM CUSTOMER
 
-GROUP BY GRADE 
+WHERE CITY = 'bhatkal'
+
+GROUP BY GRADE
 
 HAVING GRADE > (SELECT AVG(GRADE) FROM CUSTOMER WHERE CITY = 'bhatkal');
 
-ii)
 
-SELECT SALESMAN_ID, NAME 
 
-FROM SALESMAN A 
+-- Query 2: Show salespeople who have more than one customer
+
+SELECT SALESMAN_ID, NAME
+
+FROM SALESMAN A
 
 WHERE 1 < (SELECT COUNT(*) FROM CUSTOMER WHERE SALESMAN_ID = A.SALESMAN_ID);
 
-iii)
 
-SELECT S.SALESMAN_ID, S.NAME, C.CUST_NAME, S.COMMISSION 
 
-FROM SALESMAN S 
+-- Query 3: Show salespeople and customers with matching cities, plus "no_match" for salespeople without matches
+
+SELECT S.SALESMAN_ID, S.NAME, C.CUST_NAME, S.COMMISSION
+
+FROM SALESMAN S
 
 JOIN CUSTOMER C ON S.CITY = C.CITY
 
-UNION 
+UNION
 
-SELECT SALESMAN_ID, NAME, 'no_match', COMMISSION 
+SELECT SALESMAN_ID, NAME, 'no_match', COMMISSION
 
-FROM SALESMAN 
+FROM SALESMAN
 
 WHERE CITY = ANY (SELECT CITY FROM CUSTOMER)
 
 ORDER BY 2 DESC;
 
-iv)
 
-CREATE VIEW VW_ELITSALESMAN AS 
 
-SELECT B.ORD_DATE, A.SALESMAN_ID, A.NAME 
+-- Create a View for Elit Salesman (salespeople with highest purchase amounts)
 
-FROM SALESMAN A, ORDERS B 
+CREATE VIEW VW_ELITSALESMAN AS
 
-WHERE A.SALESMAN_ID = B.SALESMAN_ID 
+SELECT B.ORD_DATE, A.SALESMAN_ID, A.NAME
 
-  AND B.PURCHASE_AMT = (SELECT MAX(PURCHASE_AMT) FROM ORDERS C WHERE C.ORD_DATE = B.ORD_DATE);
+FROM SALESMAN A
 
-v)
+JOIN ORDERS B ON A.SALESMAN_ID = B.SALESMAN_ID
 
-DELETE FROM SALESMAN WHERE SALESMAN_ID = 101;
+WHERE B.PURCHASE_AMT = (SELECT MAX(PURCHASE_AMT) FROM ORDERS C WHERE C.ORD_DATE = B.ORD_DATE);
 
 
 
-PL/SQL)
+-- PL/SQL block demonstrating delete, insert, and update with row count
 
 DECLARE
 
    v_rowcount NUMBER; -- Variable to hold the row count
 
+
+
 BEGIN
 
    -- Delete records where commission is less than 18
 
-   DELETE FROM SALESMAN
+   DELETE FROM SALESMAN WHERE COMMISSION < 18;
 
-   WHERE COMMISSION < 18;
-
-
+   
 
    -- Display the number of rows affected using %ROWCOUNT
 
    v_rowcount := SQL%ROWCOUNT;
-
-
 
    DBMS_OUTPUT.PUT_LINE('Number of rows deleted: ' || v_rowcount);
 
@@ -180,7 +176,7 @@ BEGIN
 
    VALUES (106, 'john', 'chicago', 21);
 
-
+   
 
    -- Display the number of rows inserted using %ROWCOUNT
 
@@ -201,6 +197,8 @@ BEGIN
    -- Display the number of rows updated using %ROWCOUNT
 
    DBMS_OUTPUT.PUT_LINE('Number of rows updated: ' || SQL%ROWCOUNT);
+
+
 
 END;
 
